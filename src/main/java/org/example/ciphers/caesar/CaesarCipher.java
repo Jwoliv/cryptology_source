@@ -22,8 +22,7 @@ public class CaesarCipher {
     public String decrypt(String encryptedMsg, int step) {
         step = validateStep(step);
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < encryptedMsg.length(); i++) {
-            char currentChar = encryptedMsg.charAt(i);
+        for (char currentChar: encryptedMsg.toCharArray()) {
             int indexOfSymbol = ALPHABET.indexOf(currentChar);
             if (indexOfSymbol == -1) {
                 sb.append(currentChar);
