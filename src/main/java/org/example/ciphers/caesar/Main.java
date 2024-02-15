@@ -2,7 +2,7 @@ package org.example.ciphers.caesar;
 
 import java.util.Scanner;
 
-import static org.example.values.MsgText.PLAIN_TEXT;
+import static org.example.utils.MsgText.PLAIN_TEXT;
 
 public class Main {
     public static void main(String[] args) {
@@ -10,9 +10,9 @@ public class Main {
         System.out.print("[?] Enter a step: ");
         int step = scanner.nextInt();
         CaesarCipher caesarCipher = new CaesarCipher();
-        String encryptedText = caesarCipher.encrypt(PLAIN_TEXT, step);
+        String encryptedText = caesarCipher.proceedCipher(PLAIN_TEXT, step, false);
         System.out.printf("[+] Encrypted text: %s%n", encryptedText);
-        String plainText = caesarCipher.decrypt(encryptedText, step);
+        String plainText = caesarCipher.proceedCipher(encryptedText, step, true);
         System.out.printf("[+] Decrypted text: %s%n", plainText);
     }
 }

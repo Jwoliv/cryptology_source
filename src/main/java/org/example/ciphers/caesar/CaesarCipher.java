@@ -1,40 +1,31 @@
 package org.example.ciphers.caesar;
 
+import static org.example.utils.StepValidator.validateStep;
+
 public class CaesarCipher {
     private static final String ALPHABET = "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя ";
 
-    public String encrypt(String plainMsg, int step) {
-        step = validateStep(step);
+    public String proceedCipher(String plainMsg, int step, Boolean isDecrypt) {
+        step = validateStep(step, ALPHABET);
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < plainMsg.length(); i++) {
             char currentChar = plainMsg.charAt(i);
             int indexOfSymbol = ALPHABET.indexOf(currentChar);
-            if (indexOfSymbol == -1) {
-                sb.append(currentChar);
-            } else {
-                int newIndex = (indexOfSymbol + step) % ALPHABET.length();
-                sb.append(ALPHABET.charAt(newIndex));
-            }
+            char newChar = generateChar(step, isDecrypt, indexOfSymbol, currentChar);
+            sb.append(newChar);
         }
         return sb.toString();
     }
 
-    public String decrypt(String encryptedMsg, int step) {
-        step = validateStep(step);
-        StringBuilder sb = new StringBuilder();
-        for (char currentChar: encryptedMsg.toCharArray()) {
-            int indexOfSymbol = ALPHABET.indexOf(currentChar);
-            if (indexOfSymbol == -1) {
-                sb.append(currentChar);
-            } else {
-                int newIndex = (indexOfSymbol - step + ALPHABET.length()) % ALPHABET.length();
-                sb.append(ALPHABET.charAt(newIndex));
-            }
-        }
-        return sb.toString();
+    private Character generateChar(int step, Boolean isDecrypt, int indexOfSymbol, char currentChar) {
+        return indexOfSymbol == -1
+                ? currentChar :
+                ALPHABET.charAt(generateNewIndex(step, isDecrypt, indexOfSymbol));
     }
 
-    private int validateStep(int step) {
-        return step % ALPHABET.length();
+    private Integer generateNewIndex(int step, Boolean isDecrypt, int indexOfSymbol) {
+        return isDecrypt
+                ? validateStep(indexOfSymbol + step, ALPHABET)
+                : validateStep(indexOfSymbol - step + ALPHABET.length(), ALPHABET);
     }
 }

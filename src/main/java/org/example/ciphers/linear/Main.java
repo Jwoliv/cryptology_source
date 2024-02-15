@@ -2,7 +2,7 @@ package org.example.ciphers.linear;
 
 import java.util.Scanner;
 
-import static org.example.values.MsgText.PLAIN_TEXT;
+import static org.example.utils.MsgText.PLAIN_TEXT;
 
 public class Main {
 
