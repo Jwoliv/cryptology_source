@@ -1,13 +1,23 @@
 package org.example.ciphers.linear;
 
 public class LinearCipher {
-    private static final String ALPHABET = "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя1234567890-=!@#$%^&*()_+ ";
+    private static final String ALPHABET = "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюяQWERT";
 
-    public String encrypt(String plainMsg, int step) {
-        return null;
+    public String proceedCipher(String input, int key) {
+        StringBuilder result = new StringBuilder();
+        for (char ch : input.toCharArray()) {
+            if (Character.isLetter(ch)) {
+                int index = ALPHABET.indexOf(ch);
+                int newIndex = (index + key) % ALPHABET.length();
+                if (newIndex < 0) {
+                    newIndex += ALPHABET.length();
+                }
+                result.append(ALPHABET.charAt(newIndex));
+            } else {
+                result.append(ch);
+            }
+        }
+        return result.toString();
     }
 
-    public String decrypt(String encryptedMsg, int step) {
-        return null;
-    }
 }
