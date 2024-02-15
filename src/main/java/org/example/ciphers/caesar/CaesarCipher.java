@@ -5,7 +5,7 @@ import static org.example.utils.StepValidator.validateStep;
 public class CaesarCipher {
     private static final String ALPHABET = "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя ";
 
-    public String proceedCipher(String plainMsg, int step, Boolean isDecrypt) {
+    public String proceedCipher(String plainMsg, Integer step, Boolean isDecrypt) {
         step = validateStep(step, ALPHABET);
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < plainMsg.length(); i++) {
@@ -17,13 +17,13 @@ public class CaesarCipher {
         return sb.toString();
     }
 
-    private Character generateChar(int step, Boolean isDecrypt, int indexOfSymbol, char currentChar) {
+    private Character generateChar(Integer step, Boolean isDecrypt, Integer indexOfSymbol, Character currentChar) {
         return indexOfSymbol == -1
                 ? currentChar :
                 ALPHABET.charAt(generateNewIndex(step, isDecrypt, indexOfSymbol));
     }
 
-    private Integer generateNewIndex(int step, Boolean isDecrypt, int indexOfSymbol) {
+    private Integer generateNewIndex(Integer step, Boolean isDecrypt, Integer indexOfSymbol) {
         return isDecrypt
                 ? validateStep(indexOfSymbol + step, ALPHABET)
                 : validateStep(indexOfSymbol - step + ALPHABET.length(), ALPHABET);

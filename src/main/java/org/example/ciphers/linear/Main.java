@@ -11,10 +11,8 @@ public class Main {
         System.out.print("[?] Enter a step: ");
         int key = scanner.nextInt();
         LinearCipher linearCipher = new LinearCipher();
-
         String encryptedText = linearCipher.proceedCipher(PLAIN_TEXT, key);
         System.out.printf("[+] Encrypted text: %s%n", encryptedText);
-
         String decryptedText = linearCipher.proceedCipher(encryptedText, -key);
         System.out.printf("[+] Decrypted text: %s%n", decryptedText);
     }

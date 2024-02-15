@@ -5,7 +5,7 @@ import static org.example.utils.StepValidator.validateStep;
 public class LinearCipher {
     private static final String ALPHABET = "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюяQWERT";
 
-    public String proceedCipher(String input, int key) {
+    public String proceedCipher(String input, Integer key) {
         StringBuilder result = new StringBuilder();
         for (char ch : input.toCharArray()) {
             if (Character.isLetter(ch)) {
@@ -18,7 +18,7 @@ public class LinearCipher {
         return result.toString();
     }
 
-    private Integer validateNewIndex(int key, int index) {
+    private Integer validateNewIndex(Integer key, Integer index) {
         int newIndex = validateStep(index + key, ALPHABET);
         if (newIndex < 0) {
             newIndex += ALPHABET.length();
