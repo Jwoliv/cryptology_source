@@ -18,9 +18,9 @@ public class CaesarCipher {
     }
 
     private Character generateChar(Integer step, Boolean isDecrypt, Integer indexOfSymbol, Character currentChar) {
-        return indexOfSymbol == -1
-                ? currentChar :
-                ALPHABET.charAt(generateNewIndex(step, isDecrypt, indexOfSymbol));
+        return indexOfSymbol != -1
+                ? ALPHABET.charAt(generateNewIndex(step, isDecrypt, indexOfSymbol))
+                : currentChar;
     }
 
     private Integer generateNewIndex(Integer step, Boolean isDecrypt, Integer indexOfSymbol) {
