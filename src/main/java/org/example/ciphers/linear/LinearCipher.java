@@ -20,9 +20,7 @@ public class LinearCipher {
 
     private Integer validateNewIndex(Integer key, Integer index) {
         int newIndex = validateStep(index + key, ALPHABET);
-        if (newIndex < 0) {
-            newIndex += ALPHABET.length();
-        }
+        newIndex += newIndex < 0 ? ALPHABET.length() : 0;
         return newIndex;
     }
 

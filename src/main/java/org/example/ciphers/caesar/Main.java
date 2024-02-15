@@ -8,7 +8,7 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         System.out.print("[?] Enter a step: ");
-        int step = scanner.nextInt();
+        Integer step = scanner.nextInt();
         CaesarCipher caesarCipher = new CaesarCipher();
         String encryptedText = caesarCipher.proceedCipher(PLAIN_TEXT, step, false);
         System.out.printf("[+] Encrypted text: %s%n", encryptedText);

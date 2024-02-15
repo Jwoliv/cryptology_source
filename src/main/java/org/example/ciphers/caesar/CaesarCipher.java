@@ -10,9 +10,7 @@ public class CaesarCipher {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < plainMsg.length(); i++) {
             char currentChar = plainMsg.charAt(i);
-            int indexOfSymbol = ALPHABET.indexOf(currentChar);
-            char newChar = generateChar(step, isDecrypt, indexOfSymbol, currentChar);
-            sb.append(newChar);
+            sb.append(generateChar(step, isDecrypt, ALPHABET.indexOf(currentChar), currentChar));
         }
         return sb.toString();
     }
