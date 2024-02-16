@@ -9,7 +9,7 @@ public class LinearCipher {
         StringBuilder result = new StringBuilder();
         for (char ch : input.toCharArray()) {
             if (Character.isLetter(ch)) {
-                int newIndex = validateNewIndex(key, ALPHABET.indexOf(ch));
+                int newIndex = validateStep(key + ALPHABET.indexOf(ch) + ALPHABET.length(), ALPHABET);
                 result.append(ALPHABET.charAt(newIndex));
             } else {
                 result.append(ch);
@@ -17,11 +17,4 @@ public class LinearCipher {
         }
         return result.toString();
     }
-
-    private Integer validateNewIndex(Integer key, Integer index) {
-        int newIndex = validateStep(index + key, ALPHABET);
-        newIndex += newIndex < 0 ? ALPHABET.length() : 0;
-        return newIndex;
-    }
-
 }
