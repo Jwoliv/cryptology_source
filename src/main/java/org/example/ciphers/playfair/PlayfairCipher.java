@@ -30,30 +30,13 @@ public class PlayfairCipher {
         int[] positionFirstChar = findIndex(matrix, bigram.charAt(0)).clone();
         int[] positionSecondChar = findIndex(matrix, bigram.charAt(1)).clone();
         if (positionFirstChar[0] == positionSecondChar[0]) {
-            positionFirstChar[1]++;
-            positionSecondChar[1]++;
-            if (positionFirstChar[1] >= SIZE_MATRIX) {
-                positionFirstChar[1] = 0;
-            }
-            if (positionSecondChar[1] >= SIZE_MATRIX) {
-                positionSecondChar[1] = 0;
-            }
-            text.append(matrix[positionFirstChar[0]][positionFirstChar[1]]);
-            text.append(matrix[positionSecondChar[0]][positionSecondChar[1]]);
+            increaseIndex(1, positionFirstChar, positionSecondChar);
+            addSymbolsFromSameLine(text, positionFirstChar, positionSecondChar, matrix);
         } else if (positionFirstChar[1] == positionSecondChar[1]) {
-            positionFirstChar[0]++;
-            positionSecondChar[0]++;
-            if (positionFirstChar[0] >= SIZE_MATRIX) {
-                positionFirstChar[0] = 0;
-            }
-            if (positionSecondChar[0] >= SIZE_MATRIX) {
-                positionSecondChar[0] = 0;
-            }
-            text.append(matrix[positionFirstChar[0]][positionFirstChar[1]]);
-            text.append(matrix[positionSecondChar[0]][positionSecondChar[1]]);
+            increaseIndex(0, positionFirstChar, positionSecondChar);
+            addSymbolsFromSameLine(text, positionFirstChar, positionSecondChar, matrix);
         } else {
-            text.append(matrix[positionFirstChar[0]][positionSecondChar[1]]);
-            text.append(matrix[positionSecondChar[0]][positionFirstChar[1]]);
+            addSymbolsFromDifferLines(text, positionFirstChar, positionSecondChar, matrix);
         }
     }
 
@@ -62,15 +45,12 @@ public class PlayfairCipher {
         int[] positionSecondChar = findIndex(matrix, bigram.charAt(1)).clone();
         if (positionFirstChar[0] == positionSecondChar[0]) {
             decreaseIndex(1, positionFirstChar, positionSecondChar);
-            text.append(matrix[positionFirstChar[0]][positionFirstChar[1]]);
-            text.append(matrix[positionSecondChar[0]][positionSecondChar[1]]);
+            addSymbolsFromSameLine(text, positionFirstChar, positionSecondChar, matrix);
         } else if (positionFirstChar[1] == positionSecondChar[1]) {
             decreaseIndex(0, positionFirstChar, positionSecondChar);
-            text.append(matrix[positionFirstChar[0]][positionFirstChar[1]]);
-            text.append(matrix[positionSecondChar[0]][positionSecondChar[1]]);
+            addSymbolsFromSameLine(text, positionFirstChar, positionSecondChar, matrix);
         } else {
-            text.append(matrix[positionFirstChar[0]][positionSecondChar[1]]);
-            text.append(matrix[positionSecondChar[0]][positionFirstChar[1]]);
+            addSymbolsFromDifferLines(text, positionFirstChar, positionSecondChar, matrix);
         }
     }
 
@@ -189,4 +169,16 @@ public class PlayfairCipher {
         }
         return new int[] {};
     }
+
+
+    public void addSymbolsFromSameLine(StringBuilder text, int[] positionFirstChar, int[] positionSecondChar, char[][] matrix) {
+        text.append(matrix[positionFirstChar[0]][positionFirstChar[1]]);
+        text.append(matrix[positionSecondChar[0]][positionSecondChar[1]]);
+    }
+
+    public void addSymbolsFromDifferLines(StringBuilder text, int[] positionFirstChar, int[] positionSecondChar, char[][] matrix) {
+        text.append(matrix[positionFirstChar[0]][positionSecondChar[1]]);
+        text.append(matrix[positionSecondChar[0]][positionFirstChar[1]]);
+    }
+
 }
