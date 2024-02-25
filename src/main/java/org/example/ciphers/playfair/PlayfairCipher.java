@@ -19,7 +19,7 @@ public class PlayfairCipher {
 
     public String decrypt(String key, String encryptedText) {
         key = key.toLowerCase();
-        encryptedText = encryptedText.toLowerCase();;
+        encryptedText = encryptedText.toLowerCase();
         char[][] matrix = generateMatrix(getListWithoutDuplicates(key));
         StringBuilder decryptedText = new StringBuilder();
         prepareBigrams(encryptedText).forEach(x -> decryptSymbol(x, decryptedText, matrix));
