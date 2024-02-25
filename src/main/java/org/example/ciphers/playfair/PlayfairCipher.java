@@ -78,11 +78,6 @@ public class PlayfairCipher {
         }
     }
 
-    private void addSymbolsToResponse(StringBuilder decryptedText, char[][] matrix, int[] positionFirstChar, int[] positionSecondChar) {
-        decryptedText.append(matrix[positionFirstChar[0]][positionFirstChar[1]]);
-        decryptedText.append(matrix[positionSecondChar[0]][positionSecondChar[1]]);
-    }
-
     private List<String> prepareBigrams(String plainText) {
         List<String> plainTextBigrams = new ArrayList<>();
         int start = 0, end = 2, indexAllowedSymbols = 0;
