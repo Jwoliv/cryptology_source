@@ -10,62 +10,44 @@ public class PlayfairCipher {
 
     public String encrypt(String key, String plainText) {
         key = key.toLowerCase();
-        plainText = plainText.toLowerCase();
-        List<Character> chars = removeAllRepeatedSymbols(key);
-        char[][] matrix = generateMatrix(chars);
-        List<String> bigrams = prepareBigrams(plainText);
+        plainText = plainText.toLowerCase();;
+        char[][] matrix = generateMatrix(removeAllRepeatedSymbols(key));
         StringBuilder encryptedText = new StringBuilder();
-
-        for (String el : bigrams) {
+        for (String el :  prepareBigrams(plainText)) {
             int[] positionFirstChar = findIndex(matrix, el.charAt(0)).clone();
             int[] positionSecondChar = findIndex(matrix, el.charAt(1)).clone();
-
-            if (positionFirstChar[0] == positionSecondChar[0]) {
-                increaseIndex(positionFirstChar, 1, positionSecondChar);
-                addSymbolsToResponse(encryptedText, matrix, positionFirstChar, positionSecondChar);
-            } else if (positionFirstChar[1] == positionSecondChar[1]) {
-                increaseIndex(positionFirstChar, 0, positionSecondChar);
-                addSymbolsToResponse(encryptedText, matrix, positionFirstChar, positionSecondChar);
-            } else {
-                addSymbolsToResponse(encryptedText, matrix, positionFirstChar, positionSecondChar);
-            }
+            processSymbol(positionFirstChar, positionSecondChar, encryptedText, matrix, true);
         }
         return encryptedText.toString();
     }
 
-    private void increaseIndex(int[] positionFirstChar, int x, int[] positionSecondChar) {
-        positionFirstChar[x]++;
-        positionSecondChar[x]++;
-        if (positionFirstChar[x] >= SIZE_MATRIX) {
-            positionFirstChar[x] = 0;
-        }
-        if (positionSecondChar[x] >= SIZE_MATRIX) {
-            positionSecondChar[x] = 0;
-        }
-    }
-
     public String decrypt(String key, String encryptedText) {
         key = key.toLowerCase();
-        List<Character> chars = removeAllRepeatedSymbols(key);
-        char[][] matrix = generateMatrix(chars);
-        List<String> bigrams = prepareBigrams(encryptedText);
+        char[][] matrix = generateMatrix(removeAllRepeatedSymbols(key));
         StringBuilder decryptedText = new StringBuilder();
-
-        for (String el : bigrams) {
+        for (String el : prepareBigrams(encryptedText)) {
             int[] positionFirstChar = findIndex(matrix, el.charAt(0)).clone();
             int[] positionSecondChar = findIndex(matrix, el.charAt(1)).clone();
-
-            if (positionFirstChar[0] == positionSecondChar[0]) {
-                decreaseIndex(positionFirstChar, 1, positionSecondChar);
-                addSymbolsToResponse(decryptedText, matrix, positionFirstChar, positionSecondChar);
-            } else if (positionFirstChar[1] == positionSecondChar[1]) {
-                decreaseIndex(positionFirstChar, 0, positionSecondChar);
-                addSymbolsToResponse(decryptedText, matrix, positionFirstChar, positionSecondChar);
-            } else {
-                addSymbolsToResponse(decryptedText, matrix, positionFirstChar, positionSecondChar);
-            }
+            processSymbol(positionFirstChar, positionSecondChar, decryptedText, matrix, false);
         }
         return decryptedText.toString();
+    }
+
+    private void processSymbol(int[] positionFirstChar, int[] positionSecondChar, StringBuilder text, char[][] matrix, Boolean isEncryption) {
+        if (positionFirstChar[0] == positionSecondChar[0]) {
+            if (isEncryption) {
+                increaseIndex(positionFirstChar, 1, positionSecondChar);
+            } else {
+                decreaseIndex(positionFirstChar, 1, positionSecondChar);
+            }
+        } else if (positionFirstChar[1] == positionSecondChar[1]) {
+            if (isEncryption) {
+                increaseIndex(positionFirstChar, 0, positionSecondChar);
+            } else {
+                decreaseIndex(positionFirstChar, 0, positionSecondChar);
+            }
+        }
+        addSymbolsToResponse(text, matrix, positionFirstChar, positionSecondChar);
     }
 
     private void decreaseIndex(int[] positionFirstChar, int x, int[] positionSecondChar) {
@@ -76,6 +58,17 @@ public class PlayfairCipher {
         }
         if (positionSecondChar[x] < 0) {
             positionSecondChar[x] = SIZE_MATRIX - 1;
+        }
+    }
+
+    private void increaseIndex(int[] positionFirstChar, int x, int[] positionSecondChar) {
+        positionFirstChar[x]++;
+        positionSecondChar[x]++;
+        if (positionFirstChar[x] >= SIZE_MATRIX) {
+            positionFirstChar[x] = 0;
+        }
+        if (positionSecondChar[x] >= SIZE_MATRIX) {
+            positionSecondChar[x] = 0;
         }
     }
 
