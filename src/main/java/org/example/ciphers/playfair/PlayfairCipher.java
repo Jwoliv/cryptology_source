@@ -10,30 +10,25 @@ public class PlayfairCipher {
 
     public String encrypt(String key, String plainText) {
         key = key.toLowerCase();
-        plainText = plainText.toLowerCase();;
-        char[][] matrix = generateMatrix(removeAllRepeatedSymbols(key));
+        plainText = plainText.toLowerCase();
+        char[][] matrix = generateMatrix(getListWithoutDuplicates(key));
         StringBuilder encryptedText = new StringBuilder();
-        for (String el :  prepareBigrams(plainText)) {
-            int[] positionFirstChar = findIndex(matrix, el.charAt(0)).clone();
-            int[] positionSecondChar = findIndex(matrix, el.charAt(1)).clone();
-            processSymbol(positionFirstChar, positionSecondChar, encryptedText, matrix, true);
-        }
+        prepareBigrams(plainText).forEach(x -> processSymbol(x, encryptedText, matrix, true));
         return encryptedText.toString();
     }
 
     public String decrypt(String key, String encryptedText) {
         key = key.toLowerCase();
-        char[][] matrix = generateMatrix(removeAllRepeatedSymbols(key));
+        encryptedText = encryptedText.toLowerCase();;
+        char[][] matrix = generateMatrix(getListWithoutDuplicates(key));
         StringBuilder decryptedText = new StringBuilder();
-        for (String el : prepareBigrams(encryptedText)) {
-            int[] positionFirstChar = findIndex(matrix, el.charAt(0)).clone();
-            int[] positionSecondChar = findIndex(matrix, el.charAt(1)).clone();
-            processSymbol(positionFirstChar, positionSecondChar, decryptedText, matrix, false);
-        }
+        prepareBigrams(encryptedText).forEach(x -> processSymbol(x, decryptedText, matrix, false));
         return decryptedText.toString();
     }
 
-    private void processSymbol(int[] positionFirstChar, int[] positionSecondChar, StringBuilder text, char[][] matrix, Boolean isEncryption) {
+    private void processSymbol(String bigram, StringBuilder text, char[][] matrix, Boolean isEncryption) {
+        int[] positionFirstChar = findIndex(matrix, bigram.charAt(0)).clone();
+        int[] positionSecondChar = findIndex(matrix, bigram.charAt(1)).clone();
         if (positionFirstChar[0] == positionSecondChar[0]) {
             if (isEncryption) {
                 increaseIndex(positionFirstChar, 1, positionSecondChar);
@@ -51,24 +46,26 @@ public class PlayfairCipher {
     }
 
     private void decreaseIndex(int[] positionFirstChar, int x, int[] positionSecondChar) {
-        positionFirstChar[x]--;
-        positionSecondChar[x]--;
-        if (positionFirstChar[x] < 0) {
-            positionFirstChar[x] = SIZE_MATRIX - 1;
-        }
-        if (positionSecondChar[x] < 0) {
-            positionSecondChar[x] = SIZE_MATRIX - 1;
+        validatePositionDecrypt(x, positionFirstChar);
+        validatePositionDecrypt(x, positionSecondChar);
+    }
+
+    private void validatePositionDecrypt(int x, int[] positionChar) {
+        positionChar[x]--;
+        if (positionChar[x] < 0) {
+            positionChar[x] = SIZE_MATRIX - 1;
         }
     }
 
     private void increaseIndex(int[] positionFirstChar, int x, int[] positionSecondChar) {
-        positionFirstChar[x]++;
-        positionSecondChar[x]++;
-        if (positionFirstChar[x] >= SIZE_MATRIX) {
-            positionFirstChar[x] = 0;
-        }
-        if (positionSecondChar[x] >= SIZE_MATRIX) {
-            positionSecondChar[x] = 0;
+        validatePositionEncrypt(x, positionFirstChar);
+        validatePositionEncrypt(x, positionSecondChar);
+    }
+
+    private void validatePositionEncrypt(int x, int[] positionChar) {
+        positionChar[x]++;
+        if (positionChar[x] >= SIZE_MATRIX) {
+            positionChar[x] = 0;
         }
     }
 
@@ -80,7 +77,6 @@ public class PlayfairCipher {
     private List<String> prepareBigrams(String plainText) {
         List<String> plainTextBigrams = new ArrayList<>();
         int start = 0, end = 2, indexAllowedSymbols = 0;
-
         List<Character> allowedSymbols = getAllowedSymbols(plainText);
 
         while (end <= plainText.length()) {
@@ -107,11 +103,11 @@ public class PlayfairCipher {
 
     private List<Character> getAllowedSymbols(String text) {
         List<Character> allowedSymbols = new ArrayList<>(ALPHABET.chars().distinct().mapToObj(e -> (char) e).toList());
-        allowedSymbols.removeAll(text.chars().distinct().mapToObj(e -> (char) e).toList());
+        allowedSymbols.removeAll(getListWithoutDuplicates(text));
         return allowedSymbols;
     }
 
-    private List<Character> removeAllRepeatedSymbols(String text) {
+    private List<Character> getListWithoutDuplicates(String text) {
         return text.chars().distinct().mapToObj(e -> (char) e).toList();
     }
 
@@ -147,8 +143,8 @@ public class PlayfairCipher {
 
     private void addRowToMatrix(char[][] matrix, List<Character> newRow, int indexMatrix) {
         char[] newChar = new char[5];
-        for (int k = 0; k < newRow.toArray().length; k++) {
-            newChar[k] = newRow.get(k);
+        for (int i = 0; i < newRow.toArray().length; i++) {
+            newChar[i] = newRow.get(i);
         }
         matrix[indexMatrix] = newChar;
     }
@@ -156,8 +152,8 @@ public class PlayfairCipher {
     private int[] findIndex(char[][] matrix, char target) {
         for (int i = 0; i < SIZE_MATRIX; i++) {
             for (int j = 0; j < SIZE_MATRIX; j++) {
-                char el = matrix[i][j];
-                if (el == target) {
+                char element = matrix[i][j];
+                if (element == target) {
                     return new int[]{i, j};
                 }
             }
