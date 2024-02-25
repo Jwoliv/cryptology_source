@@ -31,15 +31,15 @@ public class PlayfairCipher {
         int[] positionSecondChar = findIndex(matrix, bigram.charAt(1)).clone();
         if (positionFirstChar[0] == positionSecondChar[0]) {
             if (isEncryption) {
-                increaseIndex(positionFirstChar, 1, positionSecondChar);
-            } else {
-                decreaseIndex(positionFirstChar, 1, positionSecondChar);
-            }
-        } else if (positionFirstChar[1] == positionSecondChar[1]) {
-            if (isEncryption) {
                 increaseIndex(positionFirstChar, 0, positionSecondChar);
             } else {
                 decreaseIndex(positionFirstChar, 0, positionSecondChar);
+            }
+        } else if (positionFirstChar[1] == positionSecondChar[1]) {
+            if (isEncryption) {
+                increaseIndex(positionFirstChar, 1, positionSecondChar);
+            } else {
+                decreaseIndex(positionFirstChar, 1, positionSecondChar);
             }
         }
         addSymbolsToResponse(text, matrix, positionFirstChar, positionSecondChar);
