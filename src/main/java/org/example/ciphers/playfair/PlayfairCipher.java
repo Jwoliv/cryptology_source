@@ -116,7 +116,7 @@ public class PlayfairCipher {
     }
 
     private char[][] generateMatrix(List<Character> chars) {
-        char[][] matrix = new char[5][5];
+        char[][] matrix = new char[SIZE_MATRIX][SIZE_MATRIX];
         int indexKey = 0, indexAlphabet = 0, indexMatrix = 0;
         List<Character> newRow;
         for (int i = 0; i < SIZE_MATRIX; i++) {
@@ -146,7 +146,7 @@ public class PlayfairCipher {
     }
 
     private void addRowToMatrix(char[][] matrix, List<Character> newRow, int indexMatrix) {
-        char[] newChar = new char[5];
+        char[] newChar = new char[SIZE_MATRIX];
         for (int i = 0; i < newRow.toArray().length; i++) {
             newChar[i] = newRow.get(i);
         }
