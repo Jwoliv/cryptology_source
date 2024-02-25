@@ -61,9 +61,13 @@ public class HillCipher {
     }
 
     private int getUniqueIndex(String plainText) {
-        List<Character> alphabetChars = new ArrayList<>(ALPHABET.chars().distinct().mapToObj(x -> (char) x).toList());
-        alphabetChars.removeAll(plainText.chars().distinct().mapToObj(x -> (char) x).toList());
+        List<Character> alphabetChars = new ArrayList<>(getUniqueCharacters(ALPHABET));
+        alphabetChars.removeAll(getUniqueCharacters(plainText));
         return alphabetChars.indexOf(alphabetChars.getFirst());
+    }
+
+    private List<Character> getUniqueCharacters(String text) {
+        return text.chars().distinct().mapToObj(x -> (char) x).toList();
     }
 
     public int[][] getInverseMatrix() {
