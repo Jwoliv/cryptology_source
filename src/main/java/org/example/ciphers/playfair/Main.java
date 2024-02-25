@@ -11,6 +11,7 @@ public class Main {
         String key = scanner.nextLine();
         PlayfairCipher playfairCipher = new PlayfairCipher();
         String encryptedText = playfairCipher.encrypt(key, PLAIN_TEXT_ENG_WITHOUT_SPACE);
+        System.out.printf("[+] Plain text: %s%n", PLAIN_TEXT_ENG_WITHOUT_SPACE);
         System.out.printf("[+] Encrypted text: %s%n", encryptedText);
         String decryptedText = playfairCipher.decrypt(key, encryptedText);
         System.out.printf("[+] Decrypted text: %s%n", decryptedText);
