@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HillCipher {
-    private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    private static final String ALPHABET = "_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     private static final int[][] matrix = new int[][] {
             {4, 5},
             {3, 4}

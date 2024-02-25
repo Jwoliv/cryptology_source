@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayfairCipher {
-    private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
+    private static final String ALPHABET = "_abcdefghijklmnopqrstuvwxyz";
     private static final List<Character> skipOneElements = List.of('i', 'j');
     private static final Integer SIZE_MATRIX = 5;
 
