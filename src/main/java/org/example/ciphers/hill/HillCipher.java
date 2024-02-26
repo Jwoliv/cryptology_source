@@ -37,15 +37,10 @@ public class HillCipher {
     private List<int[]> generateBigrams(String plainText, int[] indexes) {
         List<int[]> bigrams = new ArrayList<>();
         for (int i = 0; i < indexes.length; i += 2) {
-            int[] pair = new int[2];
-            if (i + 1 < indexes.length) {
-                pair[0] = indexes[i];
-                pair[1] = indexes[i + 1];
-            } else {
-                pair[0] = indexes[i];
-                pair[1] = getUniqueIndex(plainText);
-            }
-            bigrams.add(pair);
+            bigrams.add(new int[] {
+                    indexes[i],
+                    i + 1 < indexes.length ? indexes[i + 1] : getUniqueIndex(plainText)
+            });
         }
         return bigrams;
     }
