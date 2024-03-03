@@ -7,36 +7,41 @@ public class VigenereCipher {
     private static final String ALPHABET = "_abcdefghijklmnopqrstuvwxyz";
 
     public String encrypt(String plainText, String key) {
-        var plainTextIndexes = getTextIndexes(plainText);
-        var fullSizeKeyIndexes = getFullIndexes(plainText, key, plainTextIndexes);
-        List<Integer> resultAdditionIndexes = new ArrayList<>();
-        if (plainTextIndexes.size() == fullSizeKeyIndexes.size()) {
-            for (int i = 0; i < plainTextIndexes.size(); i++) {
-                resultAdditionIndexes.add((plainTextIndexes.get(i) + fullSizeKeyIndexes.get(i)) % ALPHABET.length());
-            }
-        }
-
-        StringBuilder encryptedText = new StringBuilder();
-        resultAdditionIndexes.forEach(index -> encryptedText.append(ALPHABET.charAt(index)));
-
+        List<Integer> finallyIndexes = getFinallyIndexes(plainText, key, true);
+        StringBuilder encryptedText = addSymbolsToResponseByFinalIndexes(finallyIndexes);
         return encryptedText.toString();
     }
 
     public String decrypt(String encryptText, String key) {
-        var encryptedTextIndexes = getTextIndexes(encryptText);
-        var fullSizeKeyIndexes = getFullIndexes(encryptText, key, encryptedTextIndexes);
-
-        List<Integer> resultAdditionIndexes = new ArrayList<>();
-        if (encryptedTextIndexes.size() == fullSizeKeyIndexes.size()) {
-            for (int i = 0; i < encryptedTextIndexes.size(); i++) {
-                resultAdditionIndexes.add((encryptedTextIndexes.get(i) - fullSizeKeyIndexes.get(i) + ALPHABET.length()) % ALPHABET.length());
-            }
-        }
-
-        StringBuilder encryptedText = addSymbolsToResponseByFinalIndexes(resultAdditionIndexes);
+        List<Integer> finallyIndexes = getFinallyIndexes(encryptText, key, false);
+        StringBuilder encryptedText = addSymbolsToResponseByFinalIndexes(finallyIndexes);
         return encryptedText.toString();
     }
 
+    private List<Integer> getFinallyIndexes(String text, String key, Boolean isEncrypt) {
+        var encryptedTextIndexes = getTextIndexes(text);
+        var fullSizeKeyIndexes = getFullIndexes(text, key, encryptedTextIndexes);
+        return proceedIndexes(encryptedTextIndexes, fullSizeKeyIndexes, isEncrypt);
+    }
+
+    private List<Integer> proceedIndexes(List<Integer> textIndexes, List<Integer> fullSizeIndexes, Boolean isEncrypt) {
+        List<Integer> resultAdditionIndexes = new ArrayList<>();
+        for (int i = 0; i < textIndexes.size(); i++) {
+            int newIndex = generateNewIndex(textIndexes, fullSizeIndexes, isEncrypt, i);
+            resultAdditionIndexes.add(newIndex);
+        }
+        return resultAdditionIndexes;
+    }
+
+    private int generateNewIndex(List<Integer> textIndexes, List<Integer> fullSizeIndexes, Boolean isEncrypt, int i) {
+        return (calculateTwoIndexes(textIndexes, fullSizeIndexes, isEncrypt, i) + ALPHABET.length()) % ALPHABET.length();
+    }
+
+    private int calculateTwoIndexes(List<Integer> textIndexes, List<Integer> fullSizeIndexes, Boolean isEncrypt, int i) {
+        return isEncrypt
+                ? textIndexes.get(i) + fullSizeIndexes.get(i)
+                : textIndexes.get(i) - fullSizeIndexes.get(i);
+    }
 
     private List<Integer> getFullIndexes(String text, String key, List<Integer> textIndexes) {
         var plainTextSymbols = turnStringIntoCharactersList(text.toLowerCase());
@@ -74,7 +79,6 @@ public class VigenereCipher {
                 .map(ALPHABET::indexOf)
                 .collect(Collectors.toList());
     }
-
 
     private List<Integer> getFullLengthKeyIndexes(int plainTextSymbols, List<Integer> keyIndexes, List<Integer> plainTextIndexes) {
         List<Integer> fullSizeKeyIndexes = new ArrayList<>();
