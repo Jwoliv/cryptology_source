@@ -54,22 +54,20 @@ public class VigenereCipher {
     }
 
     private List<Character> turnStringIntoCharactersList(String encryptText) {
-        return encryptText.chars().mapToObj(x -> (char) x).toList();
+        return encryptText.chars()
+                .mapToObj(x -> (char) x)
+                .toList();
     }
 
     private ArrayList<Integer> generateIndexesByList(List<Character> encryptedTextSymbols) {
         var encryptedTextIndexes = new ArrayList<Integer>();
-        for (char symbol: encryptedTextSymbols) {
-            encryptedTextIndexes.add(ALPHABET.indexOf(symbol));
-        }
+        encryptedTextSymbols.forEach(symbol ->  encryptedTextIndexes.add(ALPHABET.indexOf(symbol)));
         return encryptedTextIndexes;
     }
 
     private StringBuilder addSymbolsToResponseByFinalIndexes(List<Integer> resultAdditionIndexes) {
         StringBuilder encryptedText = new StringBuilder();
-        for (int index: resultAdditionIndexes) {
-            encryptedText.append(ALPHABET.charAt(index));
-        }
+        resultAdditionIndexes.forEach(index -> encryptedText.append(ALPHABET.charAt(index)));
         return encryptedText;
     }
 
