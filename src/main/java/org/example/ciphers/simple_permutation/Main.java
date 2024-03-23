@@ -1,13 +1,14 @@
 package org.example.ciphers.simple_permutation;
 
-import static org.example.utils.MsgText.PLAIN_TEXT_ENG_WITH_SPACES;
+import static org.example.utils.MsgText.*;
 
 public class Main {
     public static void main(String[] args) {
         SimplePermutation simplePermutation = new SimplePermutation();
-        String encryptedText = simplePermutation.encrypt(PLAIN_TEXT_ENG_WITH_SPACES);
-        System.out.println(encryptedText);
-        String plainText = simplePermutation.decrypt(encryptedText);
-        System.out.println(plainText);
+        String encryptedText = simplePermutation.encrypt(PLAIN_TEXT_ENG_WITHOUT_SPACES_AND_EXTRA_SYMBOL);
+        System.out.printf("[+] Plain text: %s%n", PLAIN_TEXT_ENG_WITHOUT_SPACES_AND_EXTRA_SYMBOL);
+        System.out.printf("[+] Encrypted text: %s%n", encryptedText);
+        String decryptedText = simplePermutation.decrypt(encryptedText);
+        System.out.printf("[+] Decrypted text: %s%n", decryptedText);
     }
 }
