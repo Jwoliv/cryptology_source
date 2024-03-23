@@ -1,8 +1,6 @@
 package org.example.ciphers.double_permutation;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class DoublePermutation {
     public String encrypt(String plaintext, int[] columnKey, int[] rowKey) {
