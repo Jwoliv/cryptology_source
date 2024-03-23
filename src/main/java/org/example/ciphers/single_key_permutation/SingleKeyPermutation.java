@@ -1,7 +1,6 @@
 package org.example.ciphers.single_key_permutation;
 
 import java.util.Arrays;
-import java.util.Map;
 
 public class SingleKeyPermutation {
     private static final String ALPHABET = "_abcdefghijklmnopqrstuvwxyz";
