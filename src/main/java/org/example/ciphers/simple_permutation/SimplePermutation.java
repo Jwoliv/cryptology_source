@@ -36,7 +36,8 @@ public class SimplePermutation {
 
         for (int i = 0; i < columnsMatrix; i++) {
             for (int j = 0; j < rowMatrix; j++) {
-                matrix[j][i] = encryptedText.charAt(indexEncryptedText++);
+                matrix[j][i] = encryptedText.charAt(indexEncryptedText);
+                indexEncryptedText++;
             }
         }
 
