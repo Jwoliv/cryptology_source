@@ -22,15 +22,14 @@ public class SimplePermutation {
                 encryptedText.append(matrix[j][i]);
             }
             if (i != columnsMatrix - 1) {
-                encryptedText.append("_");
+                encryptedText.append("&");
             }
         }
-        System.out.println(encryptedText);
         return encryptedText.toString();
     }
 
     public String decrypt(String encryptedText) {
-        int columnsMatrix = encryptedText.indexOf("_") - 1;
+        int columnsMatrix = encryptedText.indexOf("&") - 1;
         int rowMatrix = encryptedText.length() / columnsMatrix;
         char[][] matrix = new char[rowMatrix][columnsMatrix];
         int indexEncryptedText = 0;
@@ -48,7 +47,7 @@ public class SimplePermutation {
             }
         }
 
-        return plaintext.toString().replaceAll("_", "");
+        return plaintext.toString().replaceAll("&", "");
     }
 
 
