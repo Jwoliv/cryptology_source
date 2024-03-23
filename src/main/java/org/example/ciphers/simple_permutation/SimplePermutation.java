@@ -5,7 +5,6 @@ import java.util.List;
 
 public class SimplePermutation {
     public String encrypt(String plainText) {
-        plainText = plainText.replaceAll(" ", "");
         List<Integer> availableColumnsMatrix = getMaxColumns(plainText);
         int columnsMatrix = availableColumnsMatrix.get(availableColumnsMatrix.size() / 2);
         int rowMatrix = plainText.length() / columnsMatrix;
@@ -17,20 +16,18 @@ public class SimplePermutation {
             }
         }
         StringBuilder encryptedText = new StringBuilder();
-        for (int i = 0; i < columnsMatrix - 1; i++) {
+        for (int i = 0; i < columnsMatrix; i++) {
             for (int j = 0; j < rowMatrix; j++) {
                 encryptedText.append(matrix[j][i]);
             }
-            if (i != columnsMatrix - 1) {
-                encryptedText.append("&");
-            }
+            encryptedText.append("&");
         }
         return encryptedText.toString();
     }
 
     public String decrypt(String encryptedText) {
-        int columnsMatrix = encryptedText.indexOf("&") - 1;
-        int rowMatrix = encryptedText.length() / columnsMatrix;
+        int rowMatrix = encryptedText.indexOf("&") + 1;
+        int columnsMatrix = encryptedText.length() / encryptedText.indexOf("&");
         char[][] matrix = new char[rowMatrix][columnsMatrix];
         int indexEncryptedText = 0;
 
