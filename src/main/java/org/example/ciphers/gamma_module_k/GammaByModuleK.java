@@ -9,8 +9,8 @@ public class GammaByModuleK {
         String fullKeyStr = generateFullKey(plainText, key);
         StringBuilder encryptedText = new StringBuilder();
         for (int i = 0; i < plainText.length(); i++) {
-            int indexText = ALPHABET.indexOf(plainText.charAt(i));
-            int indexKey = ALPHABET.indexOf(fullKeyStr.charAt(i));
+            int indexText = getIndexFromAlphabet(plainText, i);
+            int indexKey = getIndexFromAlphabet(fullKeyStr, i);
             addSymbolToResult(indexText + indexKey, encryptedText);
         }
         return encryptedText.toString();
@@ -20,11 +20,15 @@ public class GammaByModuleK {
         String fullKeyStr = generateFullKey(encryptedText, key);
         StringBuilder plainText = new StringBuilder();
         for (int i = 0; i < encryptedText.length(); i++) {
-            int indexText = ALPHABET.indexOf(encryptedText.charAt(i));
-            int indexKey = ALPHABET.indexOf(fullKeyStr.charAt(i));
+            int indexText = getIndexFromAlphabet(encryptedText, i);
+            int indexKey = getIndexFromAlphabet(fullKeyStr, i);
             addSymbolToResult(indexText - indexKey + ALPHABET_LENGTH, plainText);
         }
         return plainText.toString();
+    }
+
+    private int getIndexFromAlphabet(String plainText, int i) {
+        return ALPHABET.indexOf(plainText.charAt(i));
     }
 
     private void addSymbolToResult(int index, StringBuilder plainText) {
