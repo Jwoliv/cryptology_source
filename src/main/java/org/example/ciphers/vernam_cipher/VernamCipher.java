@@ -25,15 +25,6 @@ public class VernamCipher {
         return new String(result, StandardCharsets.UTF_8);
     }
 
-    private int getIndexFromAlphabet(String plainText, int i) {
-        return ALPHABET.indexOf(plainText.charAt(i));
-    }
-
-    private void addSymbolToResult(int index, StringBuilder plainText) {
-        String newChar = String.valueOf(ALPHABET.charAt(index % ALPHABET_LENGTH));
-        plainText.append(newChar);
-    }
-
     private String generateFullKey(String plainText, String key) {
         StringBuilder fullKey = new StringBuilder();
         do {
