@@ -9,7 +9,7 @@ public class DirectHashFunction {
     }
 
     public Boolean validate(String plainText, Integer hash) {
-        return Objects.nonNull(plainText) && plainText.hashCode() == hash;
+        return Objects.equals(plainText.hashCode(), hash);
     }
 
 }
