@@ -1,6 +1,5 @@
 package org.example.ciphers.feistel_network;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -108,38 +107,38 @@ public class FeistelNetwork {
     };
 
     public String encrypt(String text, String key) {
-        String binaryText = convertToBinary(text);
-        String textAfterIpOpenText = changePositions(POSITION_IP_OPEN_TEXT, binaryText);
+        var binaryText = convertToBinary(text);
+        var textAfterIpOpenText = changePositions(POSITION_IP_OPEN_TEXT, binaryText);
 
-        String L0 = textAfterIpOpenText.substring(0, 32);
-        String R0 = textAfterIpOpenText.substring(32);
-        String R0Expanded = changePositions(EXPAND_RIGHT_SIDE_FROM_32_TO_48, R0);
+        var L0 = textAfterIpOpenText.substring(0, 32);
+        var R0 = textAfterIpOpenText.substring(32);
+        var R0Expanded = changePositions(EXPAND_RIGHT_SIDE_FROM_32_TO_48, R0);
 
-        String xorFirstKeyAndR0 = xorFirstKeyRoundAndR0(key, R0Expanded);
-        List<String> s1skXor = generateSegmentsBy6Bites(xorFirstKeyAndR0);
+        var xorFirstKeyAndR0 = xorFirstKeyRoundAndR0(key, R0Expanded);
+        var s1skXor = generateSegmentsBy6Bites(xorFirstKeyAndR0);
 
-        StringBuilder block32bites = proceedSegments(s1skXor);
-        String rPartFinal = changePositions(FINAL_CHANGE_POSITIONS, block32bites.toString());
+        var block32bites = proceedSegments(s1skXor);
+        var rPartFinal = changePositions(FINAL_CHANGE_POSITIONS, block32bites.toString());
 
-        String xorRPartFinalAndL0 = xorOperation(32, rPartFinal, L0);
+        var xorRPartFinalAndL0 = xorOperation(32, rPartFinal, L0);
         return xorRPartFinalAndL0 + R0;
     }
 
     private String xorFirstKeyRoundAndR0(String key, String R0Expanded) {
-        String keyFirstRound = getRoundKey(key);
+        var keyFirstRound = getRoundKey(key);
         return xorOperation(48, keyFirstRound, R0Expanded);
     }
 
     private StringBuilder proceedSegments(List<String> s1skXor) {
-        int s1skCounter = 0;
-        StringBuilder block32bites = new StringBuilder();
-        for (String s1skElement: s1skXor) {
-            String rowBinaryValue = s1skElement.charAt(0) + s1skElement.substring(s1skElement.length() - 1);
-            String columnBinaryValue = s1skElement.substring(1, s1skElement.length() - 2);
-            int numberRow = Integer.parseInt(rowBinaryValue, 2);
-            int numberColumn = Integer.parseInt(columnBinaryValue, 2);
-            int index = (numberRow * 15) + numberColumn;
-            String s1skValueBinary = String.format("%4s", Integer.toBinaryString(S1_SK[s1skCounter][index])).replace(' ', '0');
+        var s1skCounter = 0;
+        var block32bites = new StringBuilder();
+        for (var s1skElement: s1skXor) {
+            var rowBinaryValue = s1skElement.charAt(0) + s1skElement.substring(s1skElement.length() - 1);
+            var columnBinaryValue = s1skElement.substring(1, s1skElement.length() - 2);
+            var numberRow = Integer.parseInt(rowBinaryValue, 2);
+            var numberColumn = Integer.parseInt(columnBinaryValue, 2);
+            var index = (numberRow * 15) + numberColumn;
+            var s1skValueBinary = String.format("%4s", Integer.toBinaryString(S1_SK[s1skCounter][index])).replace(' ', '0');
             block32bites.append(s1skValueBinary);
             s1skCounter++;
         }
@@ -153,19 +152,19 @@ public class FeistelNetwork {
     }
 
     private String getRoundKey(String key) {
-        String binaryKey = convertToBinary(key);
-        String binaryKeyPrepare56Bites = changePositions(POSITION_56_KEY, binaryKey);
-        String shiftedKey56LS = shiftKey(binaryKeyPrepare56Bites.substring(0, 28), 0);
-        String shiftedKey56RS = shiftKey(binaryKeyPrepare56Bites.substring(28), 0);
-        String shiftedKey = shiftedKey56LS + shiftedKey56RS;
+        var binaryKey = convertToBinary(key);
+        var binaryKeyPrepare56Bites = changePositions(POSITION_56_KEY, binaryKey);
+        var shiftedKey56LS = shiftKey(binaryKeyPrepare56Bites.substring(0, 28), 0);
+        var shiftedKey56RS = shiftKey(binaryKeyPrepare56Bites.substring(28), 0);
+        var shiftedKey = shiftedKey56LS + shiftedKey56RS;
         return changePositions(COMPLETED_POSITION_KEY, shiftedKey);
     }
 
     private String xorOperation(int x, String rPartFinal, String L0) {
-        StringBuilder xorRes = new StringBuilder();
+        var xorRes = new StringBuilder();
         for (int i = 0; i < x; i++) {
-            int val1 = Integer.parseInt(String.valueOf(rPartFinal.charAt(i)));
-            int val2 = Integer.parseInt(String.valueOf(L0.charAt(i)));
+            var val1 = Integer.parseInt(String.valueOf(rPartFinal.charAt(i)));
+            var val2 = Integer.parseInt(String.valueOf(L0.charAt(i)));
             xorRes.append(val1 ^ val2);
         }
         return xorRes.toString();
@@ -177,13 +176,13 @@ public class FeistelNetwork {
     }
 
     private String changePositions(Integer[] position, String binaryKey) {
-        StringBuilder newBinaryKey = new StringBuilder();
+        var newBinaryKey = new StringBuilder();
         Arrays.stream(position).map(idx -> binaryKey.charAt(idx - 1)).forEach(newBinaryKey::append);
         return newBinaryKey.toString();
     }
 
     public String convertToBinary(String text) {
-        byte[] bytes = text.getBytes();
+        var bytes = text.getBytes();
         StringBuilder binary = new StringBuilder(IntStream.range(0, bytes.length)
                 .mapToObj(i -> Integer.toBinaryString(bytes[i]))
                 .collect(Collectors.joining()));
