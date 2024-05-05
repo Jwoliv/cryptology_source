@@ -9,8 +9,6 @@ public class Main {
         System.out.printf("[+] Text: %s\n", text);
         String encryptedBinaryText = feistelNetwork.encrypt(text, key);
         System.out.printf("[+] Encrypt: %s\n", encryptedBinaryText);
-        String decryptedBinaryText = feistelNetwork.decrypt(encryptedBinaryText, key);
-        System.out.printf("[+] Decrypt: %s\n", decryptedBinaryText);
         System.out.printf("[+]  Origin: %s\n", feistelNetwork.convertToBinary(text));
     }
 }
