@@ -107,21 +107,18 @@ public class FeistelNetwork {
     };
 
     public String encrypt(String text, String key) {
-        var binaryText = convertToBinary(text);
-        var textAfterIpOpenText = changePositions(POSITION_IP_OPEN_TEXT, binaryText);
+        var textAfterIpOpenText = changePositions(POSITION_IP_OPEN_TEXT, convertToBinary(text));
 
         var L0 = textAfterIpOpenText.substring(0, 32);
         var R0 = textAfterIpOpenText.substring(32);
         var R0Expanded = changePositions(EXPAND_RIGHT_SIDE_FROM_32_TO_48, R0);
 
-        var xorFirstKeyAndR0 = xorFirstKeyRoundAndR0(key, R0Expanded);
-        var s1skXor = generateSegmentsBy6Bites(xorFirstKeyAndR0);
+        var xorFirstKeyR0 = xorFirstKeyRoundAndR0(key, R0Expanded);
+        var s1skXor = generateSegmentsBy6Bites(xorFirstKeyR0);
 
-        var block32bites = proceedSegments(s1skXor);
-        var rPartFinal = changePositions(FINAL_CHANGE_POSITIONS, block32bites.toString());
+        var rPartFinal = changePositions(FINAL_CHANGE_POSITIONS, proceedSegments6To4(s1skXor));
 
-        var xorRPartFinalAndL0 = xorOperation(32, rPartFinal, L0);
-        return xorRPartFinalAndL0 + R0;
+        return xorOperation(32, rPartFinal, L0) + R0;
     }
 
     private String xorFirstKeyRoundAndR0(String key, String R0Expanded) {
@@ -129,7 +126,7 @@ public class FeistelNetwork {
         return xorOperation(48, keyFirstRound, R0Expanded);
     }
 
-    private StringBuilder proceedSegments(List<String> s1skXor) {
+    private String proceedSegments6To4(List<String> s1skXor) {
         var s1skCounter = 0;
         var block32bites = new StringBuilder();
         for (var s1skElement: s1skXor) {
@@ -142,7 +139,7 @@ public class FeistelNetwork {
             block32bites.append(s1skValueBinary);
             s1skCounter++;
         }
-        return block32bites;
+        return block32bites.toString();
     }
 
     private List<String> generateSegmentsBy6Bites(String xorFirstKeyAndR0) {
