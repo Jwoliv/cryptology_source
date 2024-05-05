@@ -7,6 +7,9 @@ public class Main {
         String key = "Bohdan";
         System.out.printf("[+] Key: %s\n", key);
         System.out.printf("[+] Text: %s\n", text);
-        System.out.printf("[+] Result: %s\n", feistelNetwork.hashMethod(text, key));
+        String encryptedBinaryText = feistelNetwork.encrypt(text, key);
+        System.out.printf("[+] Encrypt: %s\n", encryptedBinaryText);
+        String decryptedBinaryText = feistelNetwork.decrypt(encryptedBinaryText, key);
+        System.out.printf("[+] Decrypt: %s\n", decryptedBinaryText);
     }
 }

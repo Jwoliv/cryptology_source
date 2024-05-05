@@ -1,6 +1,8 @@
 package org.example.ciphers.feistel_network;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -98,75 +100,69 @@ public class FeistelNetwork {
             }
     };
 
-    private final static Integer[] FINAL_POSITIONS = {
+    private final static Integer[] FINAL_CHANGE_POSITIONS = {
             16, 7,20,21,29,12,28,17,
             1,15,23,26,5,18,31,10,
             2,8,24,14,32,27,3,9,
             19,13,30,6,22,11,4,25
     };
 
-    public String hashMethod(String text, String key) {
+    public String encrypt(String text, String key) {
         String binaryText = convertToBinary(text);
+
+        String textAfterIpOpenText = changePositions(POSITION_IP_OPEN_TEXT, binaryText);
+
+        String L0 = textAfterIpOpenText.substring(0, 32);
+        String R0 = textAfterIpOpenText.substring(32);
+        String R0Expanded = changePositions(EXPAND_RIGHT_SIDE_FROM_32_TO_48, R0);
+
+
         String binaryKey = convertToBinary(key);
+        String binaryKeyPrepare56Bites = changePositions(POSITION_56_KEY, binaryKey);
+        String shiftedKey56LS = shiftKey(binaryKeyPrepare56Bites.substring(0, 28), 0);
+        String shiftedKey56RS = shiftKey(binaryKeyPrepare56Bites.substring(28), 0);
+        String shiftedKey = shiftedKey56LS + shiftedKey56RS;
 
-        String newBinaryText = changePositions(POSITION_IP_OPEN_TEXT, binaryText);
+        String keyFirstRound = changePositions(COMPLETED_POSITION_KEY, shiftedKey);
 
-        String leftHalfText = newBinaryText.substring(0, 32);
-        String rightHalfText = newBinaryText.substring(32);
+        String xorFirstKeyAndR0 = xorOperation(48, keyFirstRound, R0Expanded);
 
-
-        String newBinaryKey = changePositions(POSITION_56_KEY, binaryKey);
-
-        String leftHalfKey = newBinaryKey.substring(0, 28);
-        String rightHalfKey = newBinaryKey.substring(28);
-
-        String keyLSShifted =  shiftKey(leftHalfKey, 0);
-        String keyRSShifted = shiftKey(rightHalfKey, 0);
-
-        String completedKey48bites = proceedKey(keyLSShifted + keyRSShifted);
-        String expandedRightSide48Bites = changePositions(EXPAND_RIGHT_SIDE_FROM_32_TO_48, rightHalfText);
-        StringBuilder xorKeyAndRightSideText = new StringBuilder();
-        for (int i = 0; i < 48; i++) {
-            xorKeyAndRightSideText.append((Integer.parseInt(String.valueOf(completedKey48bites.charAt(i))) ^ (Integer.parseInt(String.valueOf(expandedRightSide48Bites.charAt(i))))));
-        }
-        String[] xorBy6Chars = new String[xorKeyAndRightSideText.length() / 6];
-        int counter = 0;
-        for (int i = 0; i < xorKeyAndRightSideText.length(); i += 6) {
-            xorBy6Chars[counter] = xorKeyAndRightSideText.substring(i, i + 6);
-            counter++;
+        List<String> s1skXor = new ArrayList<>();
+        for (int i = 0; i < 48; i += 6) {
+            s1skXor.add(xorFirstKeyAndR0.substring(i, i + 6));
         }
 
-        StringBuilder changeBySBlock = new StringBuilder();
+        int s1skCounter = 0;
+        StringBuilder block32bites = new StringBuilder();
+        for (String s1skElement: s1skXor) {
+            String rowBinaryValue = s1skElement.charAt(0) + s1skElement.substring(s1skElement.length() - 1);
+            String columnBinaryValue = s1skElement.substring(1, s1skElement.length() - 2);
 
-        int counterS1Sk = 0;
-        for (String el : xorBy6Chars) {
-            String firstBinaryValue = String.valueOf(el.charAt(0)) + el.charAt(el.length() - 1);
-            String secondBinaryValue = el.substring(1, el.length() - 1);
-
-            int firstValue = Integer.parseInt(firstBinaryValue, 2);
-            int secondValue = Integer.parseInt(secondBinaryValue, 2);
-            int index = S1_SK[counterS1Sk][firstValue * secondValue];
-
-            String indexBinary = String.format("%04d", Integer.parseInt(Integer.toBinaryString(index)));
-            changeBySBlock.append(indexBinary);
-            counterS1Sk++;
+            int numberRow = Integer.parseInt(rowBinaryValue, 2);
+            int numberColumn = Integer.parseInt(columnBinaryValue, 2);
+            int index = (numberRow * 15) + numberColumn;
+            String s1skValueBinary = String.format("%4s", Integer.toBinaryString(S1_SK[s1skCounter][index])).replace(' ', '0');
+            block32bites.append(s1skValueBinary);
+            s1skCounter++;
         }
+        String rPartFinal = changePositions(FINAL_CHANGE_POSITIONS, block32bites.toString());
 
-        String finalResult = changePositions(FINAL_POSITIONS, changeBySBlock.toString());
-
-        String[] xorFinalChars = new String[finalResult.length()];
-        for (int i = 0; i < finalResult.length(); i++) {
-            int xorValue = Integer.parseInt(String.valueOf(finalResult.charAt(i))) ^ Integer.parseInt(String.valueOf(leftHalfText.charAt(i)));
-            xorFinalChars[i] = String.valueOf(xorValue);
-        }
-
-        return String.join("", xorFinalChars) + rightHalfText;
+        String xorRPartFinalAndL0 = xorOperation(32, rPartFinal, L0);
+        return xorRPartFinalAndL0 + R0;
     }
 
-    private String proceedKey(String key) {
-        return Arrays.stream(COMPLETED_POSITION_KEY)
-                .map(idx -> String.valueOf(key.charAt(idx - 1)))
-                .collect(Collectors.joining());
+    public String decrypt(String encryptedBinaryText, String key) {
+        return null;
+    }
+
+    private static String xorOperation(int x, String rPartFinal, String L0) {
+        StringBuilder xorRes = new StringBuilder();
+        for (int i = 0; i < x; i++) {
+            int val1 = Integer.parseInt(String.valueOf(rPartFinal.charAt(i)));
+            int val2 = Integer.parseInt(String.valueOf(L0.charAt(i)));
+            xorRes.append(val1 ^ val2);
+        }
+        return xorRes.toString();
     }
 
     private String shiftKey(String key, Integer round) {
