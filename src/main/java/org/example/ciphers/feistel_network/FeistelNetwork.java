@@ -2,6 +2,7 @@ package org.example.ciphers.feistel_network;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -151,10 +152,6 @@ public class FeistelNetwork {
         return xorRPartFinalAndL0 + R0;
     }
 
-    public String decrypt(String encryptedBinaryText, String key) {
-        return null;
-    }
-
     private static String xorOperation(int x, String rPartFinal, String L0) {
         StringBuilder xorRes = new StringBuilder();
         for (int i = 0; i < x; i++) {
@@ -170,7 +167,7 @@ public class FeistelNetwork {
         return key.substring(shift) + key.substring(0, shift);
     }
 
-    private String  changePositions(Integer[] position, String binaryKey) {
+    private String changePositions(Integer[] position, String binaryKey) {
         StringBuilder newBinaryKey = new StringBuilder();
         Arrays.stream(position).map(idx -> binaryKey.charAt(idx - 1)).forEach(newBinaryKey::append);
         return newBinaryKey.toString();
