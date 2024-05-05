@@ -109,35 +109,33 @@ public class FeistelNetwork {
 
     public String encrypt(String text, String key) {
         String binaryText = convertToBinary(text);
-
         String textAfterIpOpenText = changePositions(POSITION_IP_OPEN_TEXT, binaryText);
 
         String L0 = textAfterIpOpenText.substring(0, 32);
         String R0 = textAfterIpOpenText.substring(32);
         String R0Expanded = changePositions(EXPAND_RIGHT_SIDE_FROM_32_TO_48, R0);
 
+        String xorFirstKeyAndR0 = xorFirstKeyRoundAndR0(key, R0Expanded);
+        List<String> s1skXor = generateSegmentsBy6Bites(xorFirstKeyAndR0);
 
-        String binaryKey = convertToBinary(key);
-        String binaryKeyPrepare56Bites = changePositions(POSITION_56_KEY, binaryKey);
-        String shiftedKey56LS = shiftKey(binaryKeyPrepare56Bites.substring(0, 28), 0);
-        String shiftedKey56RS = shiftKey(binaryKeyPrepare56Bites.substring(28), 0);
-        String shiftedKey = shiftedKey56LS + shiftedKey56RS;
+        StringBuilder block32bites = proceedSegments(s1skXor);
+        String rPartFinal = changePositions(FINAL_CHANGE_POSITIONS, block32bites.toString());
 
-        String keyFirstRound = changePositions(COMPLETED_POSITION_KEY, shiftedKey);
+        String xorRPartFinalAndL0 = xorOperation(32, rPartFinal, L0);
+        return xorRPartFinalAndL0 + R0;
+    }
 
-        String xorFirstKeyAndR0 = xorOperation(48, keyFirstRound, R0Expanded);
+    private String xorFirstKeyRoundAndR0(String key, String R0Expanded) {
+        String keyFirstRound = getRoundKey(key);
+        return xorOperation(48, keyFirstRound, R0Expanded);
+    }
 
-        List<String> s1skXor = new ArrayList<>();
-        for (int i = 0; i < 48; i += 6) {
-            s1skXor.add(xorFirstKeyAndR0.substring(i, i + 6));
-        }
-
+    private StringBuilder proceedSegments(List<String> s1skXor) {
         int s1skCounter = 0;
         StringBuilder block32bites = new StringBuilder();
         for (String s1skElement: s1skXor) {
             String rowBinaryValue = s1skElement.charAt(0) + s1skElement.substring(s1skElement.length() - 1);
             String columnBinaryValue = s1skElement.substring(1, s1skElement.length() - 2);
-
             int numberRow = Integer.parseInt(rowBinaryValue, 2);
             int numberColumn = Integer.parseInt(columnBinaryValue, 2);
             int index = (numberRow * 15) + numberColumn;
@@ -145,13 +143,25 @@ public class FeistelNetwork {
             block32bites.append(s1skValueBinary);
             s1skCounter++;
         }
-        String rPartFinal = changePositions(FINAL_CHANGE_POSITIONS, block32bites.toString());
-
-        String xorRPartFinalAndL0 = xorOperation(32, rPartFinal, L0);
-        return xorRPartFinalAndL0 + R0;
+        return block32bites;
     }
 
-    private static String xorOperation(int x, String rPartFinal, String L0) {
+    private List<String> generateSegmentsBy6Bites(String xorFirstKeyAndR0) {
+        return IntStream.iterate(0, i -> i < 48, i -> i + 6)
+                .mapToObj(i -> xorFirstKeyAndR0.substring(i, i + 6))
+                .toList();
+    }
+
+    private String getRoundKey(String key) {
+        String binaryKey = convertToBinary(key);
+        String binaryKeyPrepare56Bites = changePositions(POSITION_56_KEY, binaryKey);
+        String shiftedKey56LS = shiftKey(binaryKeyPrepare56Bites.substring(0, 28), 0);
+        String shiftedKey56RS = shiftKey(binaryKeyPrepare56Bites.substring(28), 0);
+        String shiftedKey = shiftedKey56LS + shiftedKey56RS;
+        return changePositions(COMPLETED_POSITION_KEY, shiftedKey);
+    }
+
+    private String xorOperation(int x, String rPartFinal, String L0) {
         StringBuilder xorRes = new StringBuilder();
         for (int i = 0; i < x; i++) {
             int val1 = Integer.parseInt(String.valueOf(rPartFinal.charAt(i)));
