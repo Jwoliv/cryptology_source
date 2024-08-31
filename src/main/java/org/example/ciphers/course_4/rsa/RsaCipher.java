@@ -9,7 +9,7 @@ public class RsaCipher {
     private static final Long p =  13L;
     private static final Long q =  17L;
     private static final List<Long> eSuggestions = List.of(68L, 92L, 133L);
-    private static final Long M = 12L;
+    public static final Long M = 12L;
 
     private final Long n;
     private final Long e;
