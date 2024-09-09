@@ -15,10 +15,10 @@ public class ElGamalCipher {
         b = (long) (Math.pow(a, x) % p);
         System.out.printf("""
                 #######################
-                p = %d
-                a = %d
-                x = %d
-                M = %s
+                # p = %d
+                # a = %d
+                # x = %d
+                # M = %s
                 #######################
                 """, p, a, x, M);
         System.out.printf("open key (a = %d, p = %d, b = %d)\n", a, p, b);
@@ -27,12 +27,12 @@ public class ElGamalCipher {
     public List<Long> encrypt() {
         Random random = new Random();
         Long qP = p - 1;
-        Long y = 1L + (long) (random.nextDouble() * (p - 1L));
+        Long y = 1L + (long) (random.nextDouble() * (qP - 1L));
         while (gcd(y, qP) != 1) {
-            y = 1L + (long) (random.nextDouble() * (p - 1L));
+            y = 1L + (long) (random.nextDouble() * (qP - 1L));
         }
         Long e = (long) (Math.pow(a, y) % p);
-        Long k = (long) (Math.pow(b, y) % Integer.parseInt(M));
+        Long k = (long) (Math.pow(b, y) * Long.parseLong(M)) % p;
         System.out.printf("y = %d\n", y);
         return List.of(e, k);
     }
