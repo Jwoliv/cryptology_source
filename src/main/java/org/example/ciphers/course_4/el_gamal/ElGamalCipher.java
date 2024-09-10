@@ -31,6 +31,12 @@ public class ElGamalCipher {
         return List.of(e, k);
     }
 
+    public Long decrypt(List<Long> items) {
+        Long e = items.get(0);
+        Long k = items.get(1);
+        return k * modExp(e, p - 1 -x, p) % p;
+    }
+
     public static long modExp(long base, long exp, long mod) {
         long result = 1;
         base = base % mod;
@@ -42,11 +48,5 @@ public class ElGamalCipher {
             base = (base * base) % mod;
         }
         return result;
-    }
-
-    public Long decrypt(List<Long> items) {
-        Long e = items.get(0);
-        Long k = items.get(1);
-        return k * modExp(e, p - 1 -x, p) % p;
     }
 }
