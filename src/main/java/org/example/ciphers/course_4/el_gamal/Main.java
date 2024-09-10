@@ -6,8 +6,8 @@ public class Main {
     public static void main(String[] args) {
         ElGamalCipher elGamalCipher = new ElGamalCipher();
         List<Long> encryptedText = elGamalCipher.encrypt();
-        System.out.println(encryptedText);
+        System.out.println("encrypted text # " + encryptedText);
         Long decryptedText = elGamalCipher.decrypt(encryptedText);
-        System.out.println(decryptedText);
+        System.out.println("decrypted text # " + decryptedText);
     }
 }

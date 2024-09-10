@@ -14,10 +14,10 @@ public class ElGamalCipher {
         b = (long) (Math.pow(a, x) % p);
         System.out.printf("""
                 #######################
-                # p = %d
-                # a = %d
-                # x = %s
-                # M = %s
+                p = %d
+                a = %d
+                x = %s
+                M = %s
                 #######################
                 """, p, a, x, M);
         System.out.printf("open key (a = %d, p = %d, b = %d)\n", a, p, b);
