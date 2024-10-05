@@ -20,14 +20,16 @@ class ECCConfig {
 }
 
 class ECCMath {
-    public Point addPoints(int a, int b, int p, Point P, Point Q) {
+    private final ECCConfig config = new ECCConfig();
+
+    public Point addPoints(Point P, Point Q) {
         if (P == null) return Q;
         if (Q == null) return P;
 
         var xy1 = new Point(P.x(), P.y());
         var xy2 = new Point(Q.x(), Q.y());
-        Integer m = getM(a, p, xy1, xy2);
-        return definePoint(p, m, xy1, xy2);
+        Integer m = getM(xy1, xy2);
+        return definePoint(config.getP(), m, xy1, xy2);
     }
 
     private Point definePoint(int p, Integer m, Point xy1, Point xy2) {
@@ -37,25 +39,27 @@ class ECCMath {
         return new Point(x3, y3);
     }
 
-    private Integer getM(int a, int p, Point xy1, Point xy2) {
-            return xy1.x() == xy2.x()
-                    ? xy1.y() == xy2.y()
-                        ? (3 * xy1.x() * xy1.x() + a) * modInverse(2 * xy1.y(), p) % p
-                        : null
-                    : Integer.valueOf((xy2.y() - xy1.y()) * modInverse(xy2.x() - xy1.x(), p) % p);
+    private Integer getM(Point xy1, Point xy2) {
+        Integer a = config.getA();
+        Integer p = config.getP();
+        return xy1.x() == xy2.x()
+                ? xy1.y() == xy2.y()
+                    ? (3 * xy1.x() * xy1.x() + a) * modInverse(2 * xy1.y(), p) % p
+                    : null
+                : Integer.valueOf((xy2.y() - xy1.y()) * modInverse(xy2.x() - xy1.x(), p) % p);
     }
 
-    public Point multiply(int a, int b, int p, int k, Point P) {
+    public Point multiply(int k, Point P) {
         if (P == null || k == 0) {
             return null;
         }
         Point result = null;
         Point point = P;
         while (k > 0) {
-            if ((k & 1) == 1) {
-                result = addPoints(a, b, p, result, point);
+            if (k % 2 == 0) {
+                result = addPoints(result, point);
             }
-            point = addPoints(a, b, p, point, point);
+            point = addPoints(point, point);
             k >>= 1;
         }
         return result;
@@ -86,9 +90,9 @@ class ECCEncryptor {
         List<Integer> asciiMessage = Stream.of(message.split("")).map(x -> (int) x.charAt(0)).toList();
         List<Pair<Point, Integer>> encryptedSymbols = new ArrayList<>();
         for (int n : asciiMessage) {
-            Point Y = eccMath.multiply(config.getA(), config.getB(), config.getP(), config.getKb(), config.getG());
-            Point rY = eccMath.multiply(config.getA(), config.getB(), config.getP(), config.getR(), Y);
-            Point R = eccMath.multiply(config.getA(), config.getB(), config.getP(), config.getR(), config.getG());
+            Point Y = eccMath.multiply(config.getKb(), config.getG());
+            Point rY = eccMath.multiply(config.getR(), Y);
+            Point R = eccMath.multiply(config.getR(), config.getG());
             int C = (n * rY.x()) % config.getP();
             encryptedSymbols.add(new Pair<>(R, C));
             System.out.printf("{ %s, %5s, %5s }%n", (char) n, n, C);
@@ -107,7 +111,7 @@ class ECCDecrypted {
         encryptedSymbols.forEach(pair -> {
             Point R = pair.first();
             int C = pair.second();
-            Point Q = new ECCMath().multiply(config.getA(), config.getB(), config.getP(), config.getKb(), R);
+            Point Q = new ECCMath().multiply(config.getKb(), R);
             int x1 = Q.x();
             int decryptedSymbol = (C * eccMath.modInverse(x1, config.getP())) % config.getP();
             decryptedMessage.append((char) decryptedSymbol);
@@ -120,6 +124,6 @@ public class ECCExample {
     public static void main(String[] args) {
         List<Pair<Point, Integer>> encryptedSymbols = new ECCEncryptor().encryptMessage("lishchuk");
         String decryptedText = new ECCDecrypted().decryptMessage(encryptedSymbols);
-        System.out.printf("Decrypted %s%n", decryptedText);
+        System.out.printf("Decrypted - %s%n", decryptedText);
     }
 }
