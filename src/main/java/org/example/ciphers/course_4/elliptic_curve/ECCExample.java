@@ -72,7 +72,7 @@ class ECCMath {
     private int pow(int base, int exponent, int mod) {
         int result = 1;
         while (exponent > 0) {
-            if ((exponent & 1) == 1) {
+            if (exponent % 2 == 1) {
                 result = (result * base) % mod;
             }
             base = (base * base) % mod;
