@@ -1,8 +1,6 @@
 package org.example.ciphers.course_4.rsa_signature;
 
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.jcajce.provider.asymmetric.RSA;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemWriter;
 import org.slf4j.Logger;
@@ -16,6 +14,9 @@ import java.util.Base64;
 
 public class RSASignature {
 
+    private static final String KEY_PAIR_GENERATOR_ALGORITHM = "RSA";
+    private static final String MESSAGE_DIGEST_ALGORITHM = "SHA-256";
+    private static final String SIGNATURE_ALGORITHM = "SHA512withRSA";
     private static final Logger log = LoggerFactory.getLogger(RSASignature.class);
 
     @SneakyThrows
@@ -29,27 +30,31 @@ public class RSASignature {
         }
     }
 
-    @SneakyThrows
     public static KeyPair generateKeys() {
-        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
-        keyGen.initialize(4096);
-        KeyPair keyPair = keyGen.generateKeyPair();
-        try (PemWriter pemWriter = new PemWriter(new FileWriter("id_rsa"))) {
-            byte[] key = keyPair.getPrivate().getEncoded();
-            log.info("private key {}", key);
-            pemWriter.writeObject(new PemObject("PRIVATE KEY", key));
-        }
-        try (PemWriter pemWriter = new PemWriter(new FileWriter("id_rsa.pub"))) {
-            byte[] key = keyPair.getPublic().getEncoded();
-            log.info("public key {}", key);
-            pemWriter.writeObject(new PemObject("PUBLIC KEY", key));
-        }
+        KeyPair keyPair = generateKeyPair();
+        writeInFile("id_rsa", keyPair.getPrivate().getEncoded(), "private key {}", "PRIVATE KEY");
+        writeInFile("id_rsa.pub", keyPair.getPublic().getEncoded(), "public key {}", "PUBLIC KEY");
         return keyPair;
     }
 
     @SneakyThrows
+    private static KeyPair generateKeyPair() {
+        KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEY_PAIR_GENERATOR_ALGORITHM);
+        keyGen.initialize(4096);
+        return keyGen.generateKeyPair();
+    }
+
+    @SneakyThrows
+    private static void writeInFile(String file, byte[] key, String logMsg, String alias) {
+        try (PemWriter pemWriter = new PemWriter(new FileWriter(file))) {
+            log.info(logMsg, key);
+            pemWriter.writeObject(new PemObject(alias, key));
+        }
+    }
+
+    @SneakyThrows
     public static byte[] hashFile(String filePath) {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        MessageDigest digest = MessageDigest.getInstance(MESSAGE_DIGEST_ALGORITHM);
         byte[] fileBytes = Files.readAllBytes(Paths.get(filePath));
         return digest.digest(fileBytes);
     }
@@ -65,7 +70,7 @@ public class RSASignature {
 
     @SneakyThrows
     private static byte[] getSignedHash(PrivateKey privateKey, byte[] hashValue) {
-        Signature signature = Signature.getInstance("SHA512withRSA");
+        Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM);
         signature.initSign(privateKey);
         signature.update(hashValue);
         return signature.sign();
