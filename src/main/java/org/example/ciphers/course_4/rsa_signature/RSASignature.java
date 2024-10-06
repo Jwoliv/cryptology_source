@@ -1,8 +1,12 @@
 package org.example.ciphers.course_4.rsa_signature;
 
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.jcajce.provider.asymmetric.RSA;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileWriter;
 import java.nio.file.Files;
@@ -11,6 +15,8 @@ import java.security.*;
 import java.util.Base64;
 
 public class RSASignature {
+
+    private static final Logger log = LoggerFactory.getLogger(RSASignature.class);
 
     @SneakyThrows
     public static void main(String[] args) {
@@ -29,10 +35,14 @@ public class RSASignature {
         keyGen.initialize(4096);
         KeyPair keyPair = keyGen.generateKeyPair();
         try (PemWriter pemWriter = new PemWriter(new FileWriter("id_rsa"))) {
-            pemWriter.writeObject(new PemObject("PRIVATE KEY", keyPair.getPrivate().getEncoded()));
+            byte[] key = keyPair.getPrivate().getEncoded();
+            log.info("private key {}", key);
+            pemWriter.writeObject(new PemObject("PRIVATE KEY", key));
         }
         try (PemWriter pemWriter = new PemWriter(new FileWriter("id_rsa.pub"))) {
-            pemWriter.writeObject(new PemObject("PUBLIC KEY", keyPair.getPublic().getEncoded()));
+            byte[] key = keyPair.getPublic().getEncoded();
+            log.info("public key {}", key);
+            pemWriter.writeObject(new PemObject("PUBLIC KEY", key));
         }
         return keyPair;
     }
@@ -49,7 +59,7 @@ public class RSASignature {
         byte[] signedHash = getSignedHash(privateKey, hashValue);
         long endTime = System.nanoTime();
         double elapsedTime = (endTime - startTime) / 1_000_000.0;
-        System.out.printf("Hash signed in %.6f milliseconds.%n", elapsedTime);
+        log.info("elapsed time for signature {} milliseconds ", elapsedTime);
         return signedHash;
     }
 
