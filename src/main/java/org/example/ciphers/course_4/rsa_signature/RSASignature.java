@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 import java.security.*;
 import java.util.Base64;
 
-public class RSASignatureExample {
+public class RSASignature {
 
     @SneakyThrows
     public static void main(String[] args) {
