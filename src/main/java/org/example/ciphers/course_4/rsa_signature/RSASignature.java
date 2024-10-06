@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.*;
@@ -23,8 +24,12 @@ public class RSASignature {
     public static void main(String[] args) {
         KeyPair keyPair = generateKeys();
         String filePath = "file_plain_text.txt";
-        byte[] hashValue = hashFile(filePath);
-        byte[] signature = signHashWithTime(keyPair.getPrivate(), hashValue);
+        byte[] hashValue = generateHashByFile(filePath);
+        byte[] signature = generateSignature(keyPair.getPrivate(), hashValue);
+        writeSignatureFile(filePath, signature);
+    }
+
+    private static void writeSignatureFile(String filePath, byte[] signature) throws IOException {
         try (FileWriter sigFile = new FileWriter(filePath + ".sig")) {
             sigFile.write(Base64.getEncoder().encodeToString(signature));
         }
@@ -53,15 +58,15 @@ public class RSASignature {
     }
 
     @SneakyThrows
-    public static byte[] hashFile(String filePath) {
+    public static byte[] generateHashByFile(String filePath) {
         MessageDigest digest = MessageDigest.getInstance(MESSAGE_DIGEST_ALGORITHM);
         byte[] fileBytes = Files.readAllBytes(Paths.get(filePath));
         return digest.digest(fileBytes);
     }
 
-    public static byte[] signHashWithTime(PrivateKey privateKey, byte[] hashValue) {
+    public static byte[] generateSignature(PrivateKey privateKey, byte[] hashValue) {
         long startTime = System.nanoTime();
-        byte[] signedHash = getSignedHash(privateKey, hashValue);
+        byte[] signedHash = signHash(privateKey, hashValue);
         long endTime = System.nanoTime();
         double elapsedTime = (endTime - startTime) / 1_000_000.0;
         log.info("elapsed time for signature {} milliseconds ", elapsedTime);
@@ -69,7 +74,7 @@ public class RSASignature {
     }
 
     @SneakyThrows
-    private static byte[] getSignedHash(PrivateKey privateKey, byte[] hashValue) {
+    private static byte[] signHash(PrivateKey privateKey, byte[] hashValue) {
         Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM);
         signature.initSign(privateKey);
         signature.update(hashValue);
