@@ -28,13 +28,11 @@ public class RSASignature {
         byte[] signature = generateSignature(keyPair.getPrivate(), hashValue);
         writeSignatureFile(filePath, signature);
 
-        // Verify the original signature
-        boolean isVerified = verifySignature(keyPair.getPublic(), hashValue, signature);
+        Boolean isVerified = verifySignature(keyPair.getPublic(), hashValue, signature);
         log.info("Signature verified: {}", isVerified);
 
-        // Scenario for an invalid signature
         byte[] alteredSignature = alterSignature(signature);
-        boolean isAlteredVerified = verifySignature(keyPair.getPublic(), hashValue, alteredSignature);
+        Boolean isAlteredVerified = verifySignature(keyPair.getPublic(), hashValue, alteredSignature);
         log.info("Altered signature verified: {}", isAlteredVerified);
     }
 
