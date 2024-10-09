@@ -27,6 +27,15 @@ public class RSASignature {
         byte[] hashValue = generateHashByFile(filePath);
         byte[] signature = generateSignature(keyPair.getPrivate(), hashValue);
         writeSignatureFile(filePath, signature);
+
+        // Verify the original signature
+        boolean isVerified = verifySignature(keyPair.getPublic(), hashValue, signature);
+        log.info("Signature verified: {}", isVerified);
+
+        // Scenario for an invalid signature
+        byte[] alteredSignature = alterSignature(signature);
+        boolean isAlteredVerified = verifySignature(keyPair.getPublic(), hashValue, alteredSignature);
+        log.info("Altered signature verified: {}", isAlteredVerified);
     }
 
     private static void writeSignatureFile(String filePath, byte[] signature) throws IOException {
@@ -69,7 +78,7 @@ public class RSASignature {
         byte[] signedHash = signHash(privateKey, hashValue);
         long endTime = System.nanoTime();
         double elapsedTime = (endTime - startTime) / 1_000_000.0;
-        log.info("elapsed time for signature {} milliseconds ", elapsedTime);
+        log.info("Elapsed time for signature: {} milliseconds", elapsedTime);
         return signedHash;
     }
 
@@ -79,5 +88,24 @@ public class RSASignature {
         signature.initSign(privateKey);
         signature.update(hashValue);
         return signature.sign();
+    }
+
+    @SneakyThrows
+    public static Boolean verifySignature(PublicKey publicKey, byte[] hashValue, byte[] signature) {
+        try {
+            Signature sig = Signature.getInstance(SIGNATURE_ALGORITHM);
+            sig.initVerify(publicKey);
+            sig.update(hashValue);
+            return sig.verify(signature);
+        } catch (SignatureException e) {
+            log.error("Signature verification failed: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    private static byte[] alterSignature(byte[] originalSignature) {
+        byte[] alteredSignature = originalSignature.clone();
+        alteredSignature[alteredSignature.length - 1] += 1;
+        return alteredSignature;
     }
 }
