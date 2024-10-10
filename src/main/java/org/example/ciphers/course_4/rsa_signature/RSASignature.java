@@ -44,8 +44,8 @@ public class RSASignature {
 
     public static KeyPair generateKeys() {
         KeyPair keyPair = generateKeyPair();
-        writeInFile("id_rsa", keyPair.getPrivate().getEncoded(), "private key {}", "PRIVATE KEY");
-        writeInFile("id_rsa.pub", keyPair.getPublic().getEncoded(), "public key {}", "PUBLIC KEY");
+        writeInFile("private_key.pem", keyPair.getPrivate().getEncoded(), "private key {}", "PRIVATE KEY");
+        writeInFile("public_key.pem", keyPair.getPublic().getEncoded(), "public key {}", "PUBLIC KEY");
         return keyPair;
     }
 
