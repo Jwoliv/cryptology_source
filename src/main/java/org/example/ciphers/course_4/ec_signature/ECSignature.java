@@ -3,11 +3,8 @@ package org.example.ciphers.course_4.ec_signature;
 import lombok.SneakyThrows;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemWriter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.FileWriter;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.*;
@@ -19,34 +16,23 @@ public class ECSignature {
     private static final String KEY_PAIR_GENERATOR_ALGORITHM = "EC";
     private static final String MESSAGE_DIGEST_ALGORITHM = "SHA-256";
     private static final String SIGNATURE_ALGORITHM = "SHA256withECDSA";
-    private static final Logger log = LoggerFactory.getLogger(ECSignature.class);
+    private static final String PLAIN_TEXT_FILE = "file_plain_text.txt";
+    private static final String SIGNATURE_FILE = "file_plain_text.sig.txt";
 
     @SneakyThrows
     public static void main(String[] args) {
         KeyPair keyPair = generateKeys();
-        String filePath = "file_plain_text.txt";
-        byte[] hashValue = generateHashByFile(filePath);
-        byte[] signature = generateSignature(keyPair.getPrivate(), hashValue);
-        writeSignatureFile(filePath, signature);
-
-        Boolean isVerified = verifySignature(keyPair.getPublic(), hashValue, signature);
-        log.info("Signature verified: {}", isVerified);
-
-        byte[] alteredSignature = alterSignature(signature);
-        Boolean isAlteredVerified = verifySignature(keyPair.getPublic(), hashValue, alteredSignature);
-        log.info("Altered signature verified: {}", isAlteredVerified);
-    }
-
-    private static void writeSignatureFile(String filePath, byte[] signature) throws IOException {
-        try (FileWriter sigFile = new FileWriter(filePath + ".sig")) {
-            sigFile.write(Base64.getEncoder().encodeToString(signature));
-        }
+        byte[] fileHash = generateHashFromFile(PLAIN_TEXT_FILE);
+        byte[] encryptedHash = encryptHash(keyPair.getPrivate(), fileHash);
+        writeSignatureFile(encryptedHash);
+        boolean isVerified = verifyFileHash(keyPair.getPublic(), PLAIN_TEXT_FILE, encryptedHash);
+        System.out.println("Підпис перевірено: " + isVerified);
     }
 
     public static KeyPair generateKeys() {
         KeyPair keyPair = generateKeyPair();
-        writeInFile("private_key.pem", keyPair.getPrivate().getEncoded(), "private key {}", "PRIVATE KEY");
-        writeInFile("public_key.pem", keyPair.getPublic().getEncoded(), "public key {}", "PUBLIC KEY");
+        writeKeyToFile("private_key.pem", keyPair.getPrivate().getEncoded(), "PRIVATE KEY");
+        writeKeyToFile("public_key.pem", keyPair.getPublic().getEncoded(), "PUBLIC KEY");
         return keyPair;
     }
 
@@ -58,53 +44,41 @@ public class ECSignature {
     }
 
     @SneakyThrows
-    private static void writeInFile(String file, byte[] key, String logMsg, String alias) {
-        try (PemWriter pemWriter = new PemWriter(new FileWriter(file))) {
-            log.info(logMsg, key);
-            pemWriter.writeObject(new PemObject(alias, key));
+    private static void writeKeyToFile(String fileName, byte[] keyBytes, String description) {
+        try (PemWriter pemWriter = new PemWriter(new FileWriter(fileName))) {
+            PemObject pemObject = new PemObject(description, keyBytes);
+            pemWriter.writeObject(pemObject);
         }
     }
 
     @SneakyThrows
-    public static byte[] generateHashByFile(String filePath) {
+    public static byte[] generateHashFromFile(String filePath) {
         MessageDigest digest = MessageDigest.getInstance(MESSAGE_DIGEST_ALGORITHM);
         byte[] fileBytes = Files.readAllBytes(Paths.get(filePath));
         return digest.digest(fileBytes);
     }
 
-    public static byte[] generateSignature(PrivateKey privateKey, byte[] hashValue) {
-        long startTime = System.nanoTime();
-        byte[] signedHash = signHash(privateKey, hashValue);
-        long endTime = System.nanoTime();
-        double elapsedTime = (endTime - startTime) / 1_000_000.0;
-        log.info("Elapsed time for signature: {} milliseconds", elapsedTime);
-        return signedHash;
-    }
-
     @SneakyThrows
-    private static byte[] signHash(PrivateKey privateKey, byte[] hashValue) {
+    public static byte[] encryptHash(PrivateKey privateKey, byte[] hash) {
         Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM);
         signature.initSign(privateKey);
-        signature.update(hashValue);
+        signature.update(hash);
         return signature.sign();
     }
 
     @SneakyThrows
-    public static Boolean verifySignature(PublicKey publicKey, byte[] hashValue, byte[] signature) {
-        try {
-            Signature sig = Signature.getInstance(SIGNATURE_ALGORITHM);
-            sig.initVerify(publicKey);
-            sig.update(hashValue);
-            return sig.verify(signature);
-        } catch (SignatureException e) {
-            log.error("Signature verification failed: {}", e.getMessage());
-            return false;
+    private static void writeSignatureFile(byte[] signature) {
+        try (FileWriter sigFile = new FileWriter(ECSignature.SIGNATURE_FILE)) {
+            sigFile.write(Base64.getEncoder().encodeToString(signature));
         }
     }
 
-    private static byte[] alterSignature(byte[] originalSignature) {
-        byte[] alteredSignature = originalSignature.clone();
-        alteredSignature[alteredSignature.length - 1] += 1;
-        return alteredSignature;
+    @SneakyThrows
+    public static boolean verifyFileHash(PublicKey publicKey, String filePath, byte[] encryptedHash) {
+        byte[] fileHash = generateHashFromFile(filePath);
+        Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM);
+        signature.initVerify(publicKey);
+        signature.update(fileHash);
+        return signature.verify(encryptedHash);
     }
 }
