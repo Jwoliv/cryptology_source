@@ -21,10 +21,13 @@ public class ECSignature {
 
     @SneakyThrows
     public static void main(String[] args) {
+        // producer
         KeyPair keyPair = generateKeys();
         byte[] fileHash = generateHashFromFile(PLAIN_TEXT_FILE);
         byte[] encryptedHash = encryptHash(keyPair.getPrivate(), fileHash);
         writeSignatureFile(encryptedHash);
+
+        // consumer
         boolean isVerified = verifyFileHash(keyPair.getPublic(), PLAIN_TEXT_FILE, encryptedHash);
         System.out.println("Підпис перевірено: " + isVerified);
     }
